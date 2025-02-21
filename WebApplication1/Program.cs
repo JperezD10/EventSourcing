@@ -1,7 +1,4 @@
-using Microsoft.Extensions.Configuration;
-using MongoDB.Bson.Serialization.Serializers;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson;
+using ClassLibrary1;
 using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
