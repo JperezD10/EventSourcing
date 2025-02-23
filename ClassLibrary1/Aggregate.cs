@@ -36,19 +36,13 @@ public abstract class Aggregate<TEvent> where TEvent : class
 
     private void ApplyEvent(TEvent @event)
     {
-        switch (@event)
+        if (@event is IAcceptEventVisitor acceptor)
         {
-            case PaymentIntentCreated e:
-                ((IApply<PaymentIntentCreated>)this).Apply(e);
-                break;
-            case PaymentIntentFailed e:
-                ((IApply<PaymentIntentFailed>)this).Apply(e);
-                break;
-            case PaymentIntentFinished e:
-                ((IApply<PaymentIntentFinished>)this).Apply(e);
-                break;
-            default:
-                throw new InvalidOperationException($"No handler found for event {@event.GetType().Name}");
+            acceptor.Accept((IEventVisitor)this);
+        }
+        else
+        {
+            throw new InvalidOperationException($"No handler found for event {@event.GetType().Name}");
         }
     }
 }
@@ -68,10 +62,4 @@ public class AggregateChange<TEvent> where TEvent : class
     }
 
     public void MarkCommitted() => IsNew = false;
-}
-
-// Esta interfaz es para poder aplicar los eventos a los objetos
-public interface IApply<TEvent>
-{
-    void Apply(TEvent @event);
 }

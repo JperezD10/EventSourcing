@@ -25,7 +25,8 @@ public abstract class PaymentIntentEvent
     }
 }
 
-public class PaymentIntentCreated : PaymentIntentEvent
+
+public class PaymentIntentCreated : PaymentIntentEvent, IAcceptEventVisitor
 {
     public decimal Amount { get; private set; }
     public string Currency { get; private set; }
@@ -38,9 +39,11 @@ public class PaymentIntentCreated : PaymentIntentEvent
         Amount = amount;
         Currency = currency;
     }
+
+    public void Accept(IEventVisitor visitor) => visitor.Visit(this);
 }
 
-public class PaymentIntentFailed : PaymentIntentEvent
+public class PaymentIntentFailed : PaymentIntentEvent, IAcceptEventVisitor
 {
     public string Reason { get; private set; }
 
@@ -51,12 +54,16 @@ public class PaymentIntentFailed : PaymentIntentEvent
     {
         Reason = reason;
     }
+
+    public void Accept(IEventVisitor visitor) => visitor.Visit(this);
 }
 
-public class PaymentIntentFinished : PaymentIntentEvent
+public class PaymentIntentFinished : PaymentIntentEvent, IAcceptEventVisitor
 {
     private PaymentIntentFinished() { } // Necesario para MongoDB
 
     public PaymentIntentFinished(Guid id)
         : base(id, DateTime.UtcNow) { }
+
+    public void Accept(IEventVisitor visitor) => visitor.Visit(this);
 }

@@ -1,10 +1,10 @@
-﻿namespace ClassLibrary1;
+﻿using Microsoft.Extensions.Logging;
+
+namespace ClassLibrary1;
 
 // Aggregate Root es el objeto que vamos a persistir y que va a tener los eventos aplicados
 public class PaymentIntent : Aggregate<PaymentIntentEvent>,
-    IApply<PaymentIntentCreated>,
-    IApply<PaymentIntentFailed>,
-    IApply<PaymentIntentFinished>
+    IEventVisitor
 {
     public decimal Amount { get; private set; }
     public string Currency { get; private set; }
@@ -29,28 +29,29 @@ public class PaymentIntent : Aggregate<PaymentIntentEvent>,
     }
 
     //estos apply son llamados desde la clase de arriba porque implementa IApply
-    public void Apply(PaymentIntentCreated @event)
+
+    public void Fail(string reason) => ApplyChange(new PaymentIntentFailed(PaymentIntentId, reason));
+    public void Finish() => ApplyChange(new PaymentIntentFinished(PaymentIntentId));
+
+    public void Visit(PaymentIntentCreated e)
     {
-        PaymentIntentId = @event.PaymentIntentId;
-        Amount = @event.Amount;
-        Currency = @event.Currency;
+        PaymentIntentId = e.PaymentIntentId;
+        Amount = e.Amount;
+        Currency = e.Currency;
         Status = "Created";
     }
 
-    public void Apply(PaymentIntentFailed @event)
+    public void Visit(PaymentIntentFailed e)
     {
         if (Status == "Finished")
             throw new InvalidOperationException("Cannot fail a finished payment.");
         Status = "Failed";
     }
 
-    public void Apply(PaymentIntentFinished @event)
+    public void Visit(PaymentIntentFinished e)
     {
         if (Status == "Failed")
             throw new InvalidOperationException("Cannot finish a failed payment.");
         Status = "Finished";
     }
-
-    public void Fail(string reason) => ApplyChange(new PaymentIntentFailed(PaymentIntentId, reason));
-    public void Finish() => ApplyChange(new PaymentIntentFinished(PaymentIntentId));
 }
