@@ -19,7 +19,7 @@ namespace WebApplication1.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(ex.Message);
             }
         }
 
@@ -33,7 +33,7 @@ namespace WebApplication1.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(ex.Message);
             }
         }
 
@@ -47,7 +47,20 @@ namespace WebApplication1.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPost("{id}/pending")]
+        public async Task<IActionResult> PendingPaymentIntent(Guid id)
+        {
+            try
+            {
+                await paymentIntentService.PendingAsync(id);
+                return Ok($"Intent {id} is now in pending status");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
 
@@ -61,7 +74,7 @@ namespace WebApplication1.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(ex.Message);
             }
         }
     }

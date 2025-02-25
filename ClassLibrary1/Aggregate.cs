@@ -17,7 +17,7 @@ public abstract class Aggregate<TEvent> where TEvent : class
     public IReadOnlyCollection<TEvent> GetUncommittedChanges() => _changes.Where(c => c.IsNew).Select(c => c.Event).ToList().AsReadOnly();
     public void MarkChangesAsCommitted() => _changes.ForEach(c => c.MarkCommitted());
 
-    protected void ApplyChange(TEvent @event)
+    public void ApplyChange(TEvent @event)
     {
         ApplyEvent(@event);
         _changes.Add(new AggregateChange<TEvent>(@event, true, AggregateType));

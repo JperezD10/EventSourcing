@@ -28,11 +28,6 @@ public class PaymentIntent : Aggregate<PaymentIntentEvent>,
         return intent;
     }
 
-    //estos apply son llamados desde la clase de arriba porque implementa IApply
-
-    public void Fail(string reason) => ApplyChange(new PaymentIntentFailed(PaymentIntentId, reason));
-    public void Finish() => ApplyChange(new PaymentIntentFinished(PaymentIntentId));
-
     public void Visit(PaymentIntentCreated e)
     {
         PaymentIntentId = e.PaymentIntentId;
@@ -43,8 +38,6 @@ public class PaymentIntent : Aggregate<PaymentIntentEvent>,
 
     public void Visit(PaymentIntentFailed e)
     {
-        if (Status == "Finished")
-            throw new InvalidOperationException("Cannot fail a finished payment.");
         Status = "Failed";
     }
 
@@ -53,5 +46,11 @@ public class PaymentIntent : Aggregate<PaymentIntentEvent>,
         if (Status == "Failed")
             throw new InvalidOperationException("Cannot finish a failed payment.");
         Status = "Finished";
+    }
+
+    public void Visit(PaymentIntentPending e)
+    {
+        Status = "Pending";
+        // more logic
     }
 }

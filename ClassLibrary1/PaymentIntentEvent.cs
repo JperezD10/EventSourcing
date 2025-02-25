@@ -4,7 +4,11 @@ using MongoDB.Bson;
 namespace ClassLibrary1;
 
 [BsonDiscriminator(Required = true)]
-[BsonKnownTypes(typeof(PaymentIntentCreated), typeof(PaymentIntentFailed), typeof(PaymentIntentFinished))]
+[BsonKnownTypes(
+    typeof(PaymentIntentCreated), 
+    typeof(PaymentIntentFailed),
+    typeof(PaymentIntentPending),
+    typeof(PaymentIntentFinished))]
 public abstract class PaymentIntentEvent
 {
     [BsonId]
@@ -63,6 +67,15 @@ public class PaymentIntentFinished : PaymentIntentEvent, IAcceptEventVisitor
     private PaymentIntentFinished() { } // Necesario para MongoDB
 
     public PaymentIntentFinished(Guid id)
+        : base(id, DateTime.UtcNow) { }
+
+    public void Accept(IEventVisitor visitor) => visitor.Visit(this);
+}
+public class PaymentIntentPending: PaymentIntentEvent, IAcceptEventVisitor
+{
+    private PaymentIntentPending() { } // Necesario para MongoDB
+
+    public PaymentIntentPending(Guid id)
         : base(id, DateTime.UtcNow) { }
 
     public void Accept(IEventVisitor visitor) => visitor.Visit(this);
