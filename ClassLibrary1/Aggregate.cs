@@ -13,6 +13,7 @@ public abstract class Aggregate<TEvent> where TEvent : class
     public Guid PaymentIntentId { get; protected set; }
     public int Version { get; private set; } = 0;
     protected string AggregateType => GetType().Name;
+    public TEvent LastEvent { get; private set; }
 
     public IReadOnlyCollection<TEvent> GetUncommittedChanges() => _changes.Where(c => c.IsNew).Select(c => c.Event).ToList().AsReadOnly();
     public void MarkChangesAsCommitted() => _changes.ForEach(c => c.MarkCommitted());
@@ -32,6 +33,7 @@ public abstract class Aggregate<TEvent> where TEvent : class
             _changes.Add(new AggregateChange<TEvent>(@event, false, AggregateType));
             Version++;
         }
+        LastEvent = history.Last();
     }
 
     private void ApplyEvent(TEvent @event)

@@ -6,4 +6,5 @@ public interface IEventVisitor
     void Visit(PaymentIntentFailed e);
     void Visit(PaymentIntentFinished e);
     void Visit(PaymentIntentPending e);
+    void Visit(PaymentIntentRequired e);
 }

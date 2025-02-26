@@ -8,7 +8,8 @@ namespace ClassLibrary1;
     typeof(PaymentIntentCreated), 
     typeof(PaymentIntentFailed),
     typeof(PaymentIntentPending),
-    typeof(PaymentIntentFinished))]
+    typeof(PaymentIntentFinished),
+    typeof(PaymentIntentRequired))]
 public abstract class PaymentIntentEvent
 {
     [BsonId]
@@ -77,6 +78,20 @@ public class PaymentIntentPending: PaymentIntentEvent, IAcceptEventVisitor
 
     public PaymentIntentPending(Guid id)
         : base(id, DateTime.UtcNow) { }
+
+    public void Accept(IEventVisitor visitor) => visitor.Visit(this);
+}
+
+public class PaymentIntentRequired: PaymentIntentEvent, IAcceptEventVisitor
+{
+    public string SelectedPaymentMethodId { get; set; }
+    private PaymentIntentRequired() { } // Necesario para MongoDB
+
+    public PaymentIntentRequired(Guid id, string selectedPaymentMethodId)
+        : base(id, DateTime.UtcNow) 
+    { 
+        SelectedPaymentMethodId = selectedPaymentMethodId; 
+    }
 
     public void Accept(IEventVisitor visitor) => visitor.Visit(this);
 }

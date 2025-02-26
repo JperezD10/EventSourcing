@@ -53,4 +53,10 @@ public class PaymentIntent : Aggregate<PaymentIntentEvent>,
         Status = "Pending";
         // more logic
     }
+
+    public void Visit(PaymentIntentRequired e)
+    {
+        Status = "Required";
+        // more logic
+    }
 }

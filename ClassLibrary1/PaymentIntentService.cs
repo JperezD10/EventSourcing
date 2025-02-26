@@ -8,6 +8,7 @@ public interface IPaymentIntentService
     Task FailAsync(Guid id, string reason);
     Task FinishAsync(Guid id);
     Task PendingAsync(Guid id);
+    Task RequiredAsync(Guid id, string selectedPaymentMethodId);
     Task<PaymentIntent> GetByIdAsync(Guid id);
 }
 public class PaymentIntentService : IPaymentIntentService
@@ -46,6 +47,12 @@ public class PaymentIntentService : IPaymentIntentService
         await ChangeStatusAsync(id, new PaymentIntentPending(id));
     }
 
+    //dto
+    public async Task RequiredAsync(Guid id, string selectedPaymentMethodId)
+    {
+        //mapper from dto to event
+        await ChangeStatusAsync(id, new PaymentIntentRequired(id, selectedPaymentMethodId));
+    }
     public async Task<PaymentIntent> GetByIdAsync(Guid id)
     {
         return await _repository.GetByIdAsync(id);

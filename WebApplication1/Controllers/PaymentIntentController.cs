@@ -1,5 +1,6 @@
 ﻿using ClassLibrary1;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace WebApplication1.Controllers
 {
@@ -57,6 +58,19 @@ namespace WebApplication1.Controllers
             {
                 await paymentIntentService.PendingAsync(id);
                 return Ok($"Intent {id} is now in pending status");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpPost("{id}/required")]
+        public async Task<IActionResult> RequiredPaymentIntent(Guid id, [FromBody] string selectedPaymentMethodId)
+        {
+            try
+            {
+                await paymentIntentService.RequiredAsync(id, selectedPaymentMethodId);
+                return Ok($"Intent {id} is now in required status");
             }
             catch (Exception ex)
             {
